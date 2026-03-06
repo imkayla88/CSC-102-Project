@@ -14,26 +14,15 @@ from bomb_phases import *
 ###########
 # generates the bootup sequence on the LCD
 def bootup(n=0):
-    # if we're not animating (or we're at the end of the bootup text)
-    if (not ANIMATE or n == len(boot_text)):
-        # if we're not animating, render the entire text at once (and don't process \x00)
-        if (not ANIMATE):
-            gui._lscroll["text"] = boot_text.replace("\x00", "")
-        # configure the remaining GUI widgets
-        gui.setup()
-        # setup the phase threads, execute them, and check their statuses
-        if (RPi):
-            setup_phases()
-            check_phases()
+    gui._lscroll["text"] = boot_text.replace("\x00", "")
+    # configure the remaining GUI widgets
+    gui.setup()
+    # setup the phase threads, execute them, and check their statuses
+    if (RPi):
+        setup_phases()
+        check_phases()
     # if we're animating
-    else:
-        # add the next character (but don't render \x00 since it specifies a longer pause)
-        if (boot_text[n] != "\x00"):
-            gui._lscroll["text"] += boot_text[n]
-
-        # scroll the next character after a slight delay (\x00 is a longer delay)
-        gui.after(25 if boot_text[n] != "\x00" else 750, bootup, n + 1)
-
+   
 # sets up the phase threads
 def setup_phases():
     global timer, keypad, wires, button, toggles
@@ -186,7 +175,7 @@ strikes_left = NUM_STRIKES
 active_phases = NUM_PHASES
 
 # "boot" the bomb
-gui.after(1000, bootup)
+gui.after(100, bootup)
 
 # display the LCD GUI
 window.mainloop()
