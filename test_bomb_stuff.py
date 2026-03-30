@@ -109,3 +109,33 @@ class BombGUI:
         self.lbl_keypad.config(text=f"CODE: [ {display_code} ]")
 
         # 3. Check Silver
+        Button for Submission
+        if self.button.was_clicked():
+            self.check_code()
+
+        self.root.after(100, self.update_loop)
+
+    def check_code(self):
+        if self.keypad._value == "1234":
+            self.lbl_status.config(text="BOMB DISARMED", fg="green")
+            self.timer._running = False
+        else:
+            self.lbl_status.config(text="ACCESS DENIED", fg="red")
+            self.keypad.clear()
+
+# --- Execution ---
+if __name__ == "__main__":
+    # Initialize hardware threads
+    t = Timer(300)
+    k = Keypad()
+    b = SilverButton()
+
+    t.start()
+    k.start()
+    b.start()
+
+    # Launch GUI
+    root = Tk()
+    app = BombGUI(root, t, k, b)
+    root.mainloop()
+    
