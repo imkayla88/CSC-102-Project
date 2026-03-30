@@ -2,6 +2,14 @@ import threading
 import time
 from tkinter import Tk, Label, Frame
 
+from random import randint, shuffle, choice
+from string import ascii_uppercase
+if (RPi):
+    import board
+    from adafruit_ht16k33.segments import Seg7x4
+    from digitalio import DigitalInOut, Direction, Pull
+    from adafruit_matrixkeypad import Matrix_Keypad
+    
 # --- 1. Base Class (From your Group Discussion) ---
 class PhaseThread(threading.Thread):
     def __init__(self, name):
@@ -36,39 +44,36 @@ class Timer(PhaseThread):
 
 # --- 3. Keypad Class (With 4-Char Limit) ---
 class Keypad(PhaseThread):
-    def __init__(self):
+    def __init__(self, component_keypad):
         super().__init__("Keypad")
+        self._keypad = component_keypad
         self._value = ""
         self._running = True
-# --- UPDATE THESE PINS TO MATCH YOUR BOX ---
-        self.ROWS = [18, 23, 24, 25] # Example GPIO pins
-        self.COLS = [12, 16, 20, 21] # Example GPIO pins
-        
-        self.keys = [
-            ['1','2','3'],
-            ['4','5','6'],
-            ['7','8','9'],
-            ['*','0','#']
-        ]
 
-        # Setup GPIO
-        GPIO.setmode(GPIO.BCM)
-        for j in self.COLS:
-            GPIO.setup(j, GPIO.OUT)
-            GPIO.output(j, 1)
-        for i in self.ROWS:
-            GPIO.setup(i, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    
     def run(self):
         while self._running:
-            # Simulate hardware read
-            # pressed = hardware.get_key() 
-            pass 
+            # Check for keys currently being pressed
+            keys = self._keypad.pressed_keys
+            
+            if keys:
+                # 'keys' is a list, we take the first press found
+                key = keys[0]
+                
+                # Logic to only add if it's a number (0-9)
+                if isinstance(key, int):
+                    self.add_key(key)
+                
+                # "Debounce" - wait until the key is released before checking again
+                while len(self._keypad.pressed_keys) > 0:
+                    time.sleep(0.05)
+            
+            time.sleep(0.1)
 
     def add_key(self, key):
         self._value += str(key)
+        # Keep only the last 4 characters (as per your group's requirement)
         if len(self._value) > 4:
-            self._value = self._value[-4:] # Keep last 4
+            self._value = self._value[-4:]
 
     def clear(self):
         self._value = ""
@@ -143,16 +148,21 @@ class BombGUI:
 
 # --- Execution ---
 if __name__ == "__main__":
-    # Initialize hardware threads
+    # 1. Initialize hardware (your provided setup code)
+    # ... keypad_rows, keypad_cols, etc ...
+    # component_keypad = Matrix_Keypad(keypad_rows, keypad_cols, keypad_keys)
+
+    # 2. Initialize threads
     t = Timer(300)
-    k = Keypad()
+    k = Keypad(component_keypad) # Pass the hardware component here!
     b = SilverButton()
 
+    # 3. Start threads
     t.start()
     k.start()
     b.start()
 
-    # Launch GUI
+    # 4. Launch GUI
     root = Tk()
     app = BombGUI(root, t, k, b)
     root.mainloop()
