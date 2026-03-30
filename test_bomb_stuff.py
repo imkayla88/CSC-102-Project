@@ -40,7 +40,25 @@ class Keypad(PhaseThread):
         super().__init__("Keypad")
         self._value = ""
         self._running = True
+# --- UPDATE THESE PINS TO MATCH YOUR BOX ---
+        self.ROWS = [18, 23, 24, 25] # Example GPIO pins
+        self.COLS = [12, 16, 20, 21] # Example GPIO pins
+        
+        self.keys = [
+            ['1','2','3'],
+            ['4','5','6'],
+            ['7','8','9'],
+            ['*','0','#']
+        ]
 
+        # Setup GPIO
+        GPIO.setmode(GPIO.BCM)
+        for j in self.COLS:
+            GPIO.setup(j, GPIO.OUT)
+            GPIO.output(j, 1)
+        for i in self.ROWS:
+            GPIO.setup(i, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    
     def run(self):
         while self._running:
             # Simulate hardware read
