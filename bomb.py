@@ -1,7 +1,7 @@
 #################################
 # CSC 102 Defuse the Bomb Project
 # Main program
-# Team: 
+# Team: Cyron, Kayla, and Nabil
 #################################
 
 # import the configs
