@@ -10,7 +10,7 @@ from bomb_configs import *
 from bomb_phases2 import *
 
 ###########
-# functions
+# functio
 ###########
 # generates the bootup sequence on the LCD
 def bootup(n=0):
