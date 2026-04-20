@@ -61,7 +61,7 @@ def check_phases():
         # the countdown has expired -> explode!
         # turn off the bomb and render the conclusion GUI
         turn_off()
-        gui.after(100, gui.conclusion, False)
+        gui.after(100, gui.conclusion, "lose")
         # don't check any more phases
         return
     # check the keypad
@@ -124,7 +124,7 @@ def check_phases():
     if (strikes_left == 0):
         # turn off the bomb and render the conclusion GUI
         turn_off()
-        gui.after(1000, gui.conclusion, False)
+        gui.after(1000, gui.conclusion, "lose")
         # stop checking phases
         return
 
@@ -132,7 +132,7 @@ def check_phases():
     if (active_phases == 0):
         # turn off the bomb and render the conclusion GUI
         turn_off()
-        gui.after(100, gui.conclusion, True)
+        gui.after(100, gui.conclusion, "win")
         # stop checking phases
         return
 
