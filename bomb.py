@@ -8,20 +8,58 @@
 from bomb_configs import *
 # import the phases
 from bomb_phases2 import *
+# to import music
+import pygame
+# typing / startup sound
+pygame.mixer.init()
+bootup_sound = pygame.mixer.Sound("Transmitting.mp3")      
+bg_music = "Background.mp3"
+###########
+# functions
+###########
 
-###########
-# functio
-###########
+# types everything character by character in each line
+def type_text(widget, text, delay=30, on_complete = None):
+    widget["text"] = ""
+    lines = text.split("\n")
+
+    def type_line(line_index=0, char_index=0):
+        # done typing everything
+        if line_index >= len(lines):
+            if on_complete:
+                on_complete()
+            return
+        
+        current_text = widget["text"]
+
+        # still typing characters in this line
+        if char_index < len(lines[line_index]):
+            widget["text"] = current_text + lines[line_index][char_index]
+            widget.after(delay, type_line, line_index, char_index + 1)
+        else:
+            # move to next line
+            widget["text"] = current_text + "\n"
+            widget.after(delay * 3, type_line, line_index + 1, 0)
+
+    type_line()
 # generates the bootup sequence on the LCD
 def bootup(n=0):
-    gui._lscroll["text"] = boot_text.replace("\x00", "")
+    bootup_sound.play(-1)
+    type_text(gui._lscroll, boot_text.replace("\x00", ""), on_complete = after_boot)
+    
+def after_boot():
+    bootup_sound.stop()  # stop booting sound
+
+    pygame.mixer.music.load(bg_music)
+    pygame.mixer.music.play(-1)  # loop forever
+    
     # configure the remaining GUI widgets
     gui.setup()
     # setup the phase threads, execute them, and check their statuses
     if (RPi):
         setup_phases()
         check_phases()
-    # if we're animating
+    
    
 # sets up the phase threads
 def setup_phases():
@@ -61,7 +99,7 @@ def check_phases():
         # the countdown has expired -> explode!
         # turn off the bomb and render the conclusion GUI
         turn_off()
-        gui.after(100, gui.conclusion, "lose")
+        gui.after(100, gui.conclusion, False)
         # don't check any more phases
         return
     # check the keypad
@@ -124,7 +162,7 @@ def check_phases():
     if (strikes_left == 0):
         # turn off the bomb and render the conclusion GUI
         turn_off()
-        gui.after(1000, gui.conclusion, "lose")
+        gui.after(1000, gui.conclusion, False)
         # stop checking phases
         return
 
@@ -132,7 +170,7 @@ def check_phases():
     if (active_phases == 0):
         # turn off the bomb and render the conclusion GUI
         turn_off()
-        gui.after(100, gui.conclusion, "win")
+        gui.after(100, gui.conclusion, True)
         # stop checking phases
         return
 
@@ -161,7 +199,6 @@ def turn_off():
     # turn off the pushbutton's LED
     for pin in button._rgb:
         pin.value = True
-
 ######
 # MAIN
 ######
@@ -170,12 +207,19 @@ def turn_off():
 window = Tk()
 gui = Lcd(window)
 
+
 # initialize the bomb strikes and active phases (i.e., not yet defused)
 strikes_left = NUM_STRIKES
 active_phases = NUM_PHASES
 
+#to initialize background sound
+pygame.mixer.init()
+pygame.mixer.music.load("Background.mp3")  # your file name
+pygame.mixer.music.play(-1)  # -1 = loop forever
+
 # "boot" the bomb
 gui.after(100, bootup)
+
 
 # display the LCD GUI
 window.mainloop()

@@ -13,8 +13,6 @@ from threading import Thread
 from time import sleep
 import os
 import sys
-from pathlib import Path
-
 #########
 # classes
 #########
@@ -33,6 +31,12 @@ class Lcd(Frame):
 
     # sets up the LCD "boot" GUI
     def setupBoot(self):
+        self.pack(fill=BOTH, expand=True)
+        
+        self.bg_image = PhotoImage(file="starsbackground.gif")
+        self.bg_label = Label(self, image=self.bg_image)
+        self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        self.bg_label.lower()
         # set column weights
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=2)
@@ -41,6 +45,20 @@ class Lcd(Frame):
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
         self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
         self.pack(fill=BOTH, expand=True)
+        
+        # kill switch button (always visible)
+        self._bkill = tkinter.Button(
+        self,
+        bg="red",
+        fg="white",
+        font=("Courier New", 16),
+        text="KILL SWITCH",
+        command=self.kill_switch)
+        self._bkill.place(relx=1, rely=0, anchor="ne")
+    def kill_switch(self):
+        import pygame
+        pygame.mixer.music.stop()
+        self.quit()
 
     # sets up the LCD GUI
     def setup(self):
@@ -82,78 +100,9 @@ class Lcd(Frame):
     def pause(self):
         if (RPi):
             self._timer.pause()
-    
-
-    #For screens
-    #Load all frames from a GIF file
-    def loadGifFrames(self, gif_path):
-        frames = []
-        index = 0
-
-        while (True):
-            try:
-                frame = PhotoImage(file=gif_path, format=f"gif -index {index}")
-                frames.append(frame)
-                index += 1
-            except:
-                break
-
-        return frames
-
-    # show either a static image or animated gif on the ending screen
-    def showEndingVisual(self, file_name):
-        # clear old animation job if one exists
-        self._gif_job = None
-
-        file_path = Path(__file__).resolve().parent / file_name
-
-        # if file does not exist, just show text only
-        if (not file_path.exists()):
-            return
-
-        # decide how to load it
-        extension = file_path.suffix.lower()
-
-        # GIF
-        if (extension == ".gif"):
-            self._ending_frames = self.loadGifFrames(str(file_path))
-
-            if (len(self._ending_frames) == 0):
-                return
-
-            self._ending_label = Label(self, bg="black", image=self._ending_frames[0])
-            self._ending_label.grid(row=1, column=0, columnspan=3, pady=20)
-
-            # animated gif
-            if (len(self._ending_frames) > 1):
-                self._gif_index = 0
-                self.animateGif()
-            # single-frame gif
-            else:
-                self._ending_label.image = self._ending_frames[0]
-
-        # PNG image (or other PhotoImage-supported static format)
-        else:
-            self._ending_image = PhotoImage(file=str(file_path))
-            self._ending_label = Label(self, bg="black", image=self._ending_image)
-            self._ending_label.image = self._ending_image
-            self._ending_label.grid(row=1, column=0, columnspan=3, pady=20)
-
-    # animate gif frames
-    def animateGif(self):
-        if (not hasattr(self, "_ending_frames") or len(self._ending_frames) == 0):
-            return
-
-        frame = self._ending_frames[self._gif_index]
-        self._ending_label.configure(image=frame)
-        self._ending_label.image = frame
-
-        self._gif_index = (self._gif_index + 1) % len(self._ending_frames)
-        self._gif_job = self.after(100, self.animateGif)
 
     # setup the conclusion GUI (explosion/defusion)
-        # setup the conclusion GUI
-    def conclusion(self, mode="lose"):
+    def conclusion(self, success=False):
         # destroy/clear widgets that are no longer needed
         self._lscroll["text"] = ""
         self._ltimer.destroy()
@@ -162,70 +111,18 @@ class Lcd(Frame):
         self._lbutton.destroy()
         self._ltoggles.destroy()
         self._lstrikes.destroy()
-
         if (SHOW_BUTTONS):
             self._bpause.destroy()
             self._bquit.destroy()
 
-        # choose screen settings
-        if (mode == "win"):
-            title_text = "BOMB DEFUSED"
-            title_color = "#00ff00"
-            subtitle_text = "Nice work."
-            visual_file = "win.gif"   
-        else:
-            title_text = "NO TRIALS LEFT"
-            title_color = "red"
-            subtitle_text = "You used all your strikes."
-            visual_file = "lose.gif"  
+        # reconfigure the GUI
+        # the retry button
+        self._bretry = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Retry", anchor=CENTER, command=self.retry)
+        self._bretry.grid(row=1, column=0, pady=40)
+        # the quit button
+        self._bquit = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Quit", anchor=CENTER, command=self.quit)
+        self._bquit.grid(row=1, column=2, pady=40)
 
-        # big title
-        self._lend_title = Label(
-            self,
-            bg="black",
-            fg=title_color,
-            font=("Courier New", 28, "bold"),
-            text=title_text
-        )
-        self._lend_title.grid(row=0, column=0, columnspan=3, pady=(40, 10))
-
-        # show image/gif if file exists
-        self.showEndingVisual(visual_file)
-
-        # subtitle
-        self._lend_subtitle = Label(
-            self,
-            bg="black",
-            fg="white",
-            font=("Courier New", 18),
-            text=subtitle_text,
-            justify=CENTER
-        )
-        self._lend_subtitle.grid(row=2, column=0, columnspan=3, pady=(10, 30))
-
-        # retry button
-        self._bretry = tkinter.Button(
-            self,
-            bg="red",
-            fg="white",
-            font=("Courier New", 18),
-            text="Retry",
-            anchor=CENTER,
-            command=self.retry
-        )
-        self._bretry.grid(row=3, column=0, pady=40)
-
-        # quit button
-        self._bquit = tkinter.Button(
-            self,
-            bg="red",
-            fg="white",
-            font=("Courier New", 18),
-            text="Quit",
-            anchor=CENTER,
-            command=self.quit
-        )
-        self._bquit.grid(row=3, column=2, pady=40)
     # re-attempts the bomb (after an explosion or a successful defusion)
     def retry(self):
         # re-launch the program (and exit this one)
@@ -283,6 +180,7 @@ class Timer(PhaseThread):
             if (not self._paused):
                 # update the timer and display its value on the 7-segment display
                 self._update()
+                
                 self._component.print(str(self))
                 # wait 1s (default) and continue
                 sleep(self._interval)
