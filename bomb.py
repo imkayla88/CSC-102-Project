@@ -5,6 +5,8 @@
 #################################
 
 # import the configs
+import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from bomb_configs import *
 # import the phases
 from bomb_phases2 import *

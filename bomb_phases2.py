@@ -33,7 +33,7 @@ class Lcd(Frame):
     def setupBoot(self):
         self.pack(fill=BOTH, expand=True)
         
-        self.bg_image = PhotoImage(file="starsbackground.gif")
+        self.bg_image = PhotoImage(file="win.gif") #this is the wrong image. it was not working. Correct immage is: starsbackground.gif
         self.bg_label = Label(self, image=self.bg_image)
         self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
         self.bg_label.lower()
