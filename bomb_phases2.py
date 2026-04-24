@@ -2,8 +2,6 @@
 # CSC 102 Defuse the Bomb Project
 # GUI and Phase class definitions
 # Team: Cyron, Kayla, and Nabil
-
-## Dr. Matt was here
 #################################
 
 # import the configs
@@ -379,3 +377,6 @@ class Toggles(PhaseThread):
             return "DEFUSED"
         else:
             return str(self._value)
+        
+
+# This is a test comment
