@@ -105,24 +105,53 @@ class Lcd(Frame):
 
     # setup the conclusion GUI (explosion/defusion)
     def conclusion(self, success=False):
-        # destroy/clear widgets that are no longer needed
+        # clear the old text
         self._lscroll["text"] = ""
+
+        # remove the game labels from the screen
         self._ltimer.destroy()
         self._lkeypad.destroy()
         self._lwires.destroy()
         self._lbutton.destroy()
         self._ltoggles.destroy()
         self._lstrikes.destroy()
+
         if (SHOW_BUTTONS):
             self._bpause.destroy()
             self._bquit.destroy()
 
-        # reconfigure the GUI
-        # the retry button
-        self._bretry = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Retry", anchor=CENTER, command=self.retry)
+        # choose the correct ending GIF
+        if success:
+            self.end_image = PhotoImage(file="win.gif")
+        else:
+            self.end_image = PhotoImage(file="lose.gif")
+
+        # show the GIF on the screen
+        self.end_label = Label(self, image=self.end_image, bg="black")
+        self.end_label.grid(row=0, column=0, columnspan=3, pady=20)
+
+        # retry button
+        self._bretry = tkinter.Button(
+            self,
+            bg="red",
+            fg="white",
+            font=("Courier New", 18),
+            text="Retry",
+            anchor=CENTER,
+            command=self.retry
+        )
         self._bretry.grid(row=1, column=0, pady=40)
-        # the quit button
-        self._bquit = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Quit", anchor=CENTER, command=self.quit)
+
+        # quit button
+        self._bquit = tkinter.Button(
+            self,
+            bg="red",
+            fg="white",
+            font=("Courier New", 18),
+            text="Quit",
+            anchor=CENTER,
+            command=self.quit
+        )
         self._bquit.grid(row=1, column=2, pady=40)
 
     # re-attempts the bomb (after an explosion or a successful defusion)
