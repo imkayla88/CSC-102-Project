@@ -44,7 +44,7 @@ class Lcd(Frame):
         self.columnconfigure(1, weight=2)
         self.columnconfigure(2, weight=1)
         self._title = Label(self, bg="black", fg="#00ff00", font=("Courier New", 30, "bold"), text="DEFUSE THE BOMB")
-        self._title.grid(row=0, column=0, columnspan=3, sticky=W, padx=40)
+        self._title.grid(row=0, column=0, columnspan=3, pady=(30, 10))
         # the scrolling informative "boot" text
         self._lscroll = Label(self, bg="black", fg="#00ff00", font=("Courier New", 14), text="", justify=LEFT)
         self._lscroll.grid(row=1, column=0, columnspan=3, sticky=W, padx=40)
@@ -66,9 +66,6 @@ class Lcd(Frame):
 
     # sets up the LCD GUI
     def setup(self):
-        # the timer
-        self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
-        self._ltimer.grid(row=0, column=0, columnspan=3, sticky=W)
         # the keypad passphrase
         self._lkeypad = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Keypad phase: ")
         self._lkeypad.grid(row=2, column=0, columnspan=3, sticky=W)
@@ -111,7 +108,6 @@ class Lcd(Frame):
         self._lscroll["text"] = ""
 
         # remove the game labels from the screen
-        self._ltimer.destroy()
         self._lkeypad.destroy()
         self._lwires.destroy()
         self._lbutton.destroy()
