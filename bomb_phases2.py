@@ -43,11 +43,11 @@ class Lcd(Frame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=2)
         self.columnconfigure(2, weight=1)
-        self._title = Label(self, bg="black", fg="red", font=("Courier New", 30, "bold"), text="DEFUSE THE BOMB")
+        self._title = Label(self, bg="black", fg="#00ff00", font=("Courier New", 30, "bold"), text="DEFUSE THE BOMB")
         self._title.grid(row=0, column=0, columnspan=3, sticky=W, padx=40)
         # the scrolling informative "boot" text
-        self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
-        self._lscroll.grid(row=1, column=0, columnspan=3, sticky=W)
+        self._lscroll = Label(self, bg="black", fg="#00ff00", font=("Courier New", 14), text="", justify=LEFT)
+        self._lscroll.grid(row=1, column=0, columnspan=3, sticky=W, padx=40)
         self.pack(fill=BOTH, expand=True)
         
         # kill switch button (always visible)
@@ -68,7 +68,7 @@ class Lcd(Frame):
     def setup(self):
         # the timer
         self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
-        self._ltimer.grid(row=1, column=0, columnspan=3, sticky=W)
+        self._ltimer.grid(row=0, column=0, columnspan=3, sticky=W)
         # the keypad passphrase
         self._lkeypad = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Keypad phase: ")
         self._lkeypad.grid(row=2, column=0, columnspan=3, sticky=W)
