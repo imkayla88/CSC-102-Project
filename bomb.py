@@ -159,7 +159,7 @@ def check_phases():
             toggles._failed = False
 
     # note the strikes on the GUI
-    gui._lstrikes["text"] = f"Strikes left: {strikes_left}"
+    gui._lstrikes["text"] = f"Strikes left: {'█ ' * strikes_left}"
     # too many strikes -> explode!
     if (strikes_left == 0):
         # turn off the bomb and render the conclusion GUI
