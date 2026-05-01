@@ -95,8 +95,7 @@ def check_phases():
     
     # check the timer
     if (timer._running):
-        # update the GUI
-        gui._ltimer["text"] = f"Time left: {timer}"
+        pass
     else:
         # the countdown has expired -> explode!
         # turn off the bomb and render the conclusion GUI
