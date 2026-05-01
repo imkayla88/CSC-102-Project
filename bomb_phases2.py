@@ -44,7 +44,7 @@ class Lcd(Frame):
         self.columnconfigure(1, weight=2)
         self.columnconfigure(2, weight=1)
         self._title = Label(self, bg="black", fg="red", font=("Courier New", 30, "bold"), text="DEFUSE THE BOMB")
-        self._title.grid(row=0, column=0, columnspan=3, pady=(30, 10))
+        self._title.grid(row=0, column=0, columnspan=3, sticky=W, padx=40)
         # the scrolling informative "boot" text
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
         self._lscroll.grid(row=1, column=0, columnspan=3, sticky=W)
