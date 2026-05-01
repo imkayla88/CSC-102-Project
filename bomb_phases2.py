@@ -291,7 +291,7 @@ class Wires(PhaseThread):
     def run(self):
         self._running = True
         # Initial state: all wires connected (True)
-        previous_state = [True] * 5 
+        previous_state = [pin.value for pin in self._component] 
         
         while (self._running):
             # Read current physical state of wires
