@@ -15,6 +15,7 @@ from threading import Thread
 from time import sleep
 import os
 import sys
+from PIL import Image, ImageTk
 #########
 # classes
 #########
@@ -35,7 +36,18 @@ class Lcd(Frame):
     def setupBoot(self):
         self.pack(fill=BOTH, expand=True)
         
-        self.bg_image = PhotoImage(file="starsbackground.gif") #this is the wrong image. it was not working. Correct immage is: starsbackground.gif
+        # get the screen size
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        
+        # open and resize the background image to fit the screen
+        bg = Image.open("starsbackground.gif")
+        bg = bg.resize((screen_width, screen_height))
+        
+        # convert it so Tkinter can use it
+        self.bg_image = ImageTk.PhotoImage(bg)
+        
+        # place the background behind everything
         self.bg_label = Label(self, image=self.bg_image)
         self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
         self.bg_label.lower()
