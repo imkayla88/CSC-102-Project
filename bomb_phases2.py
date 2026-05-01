@@ -281,52 +281,58 @@ class Keypad(PhaseThread):
 class Wires(PhaseThread):
     def __init__(self, component, target, name="Wires"):
         super().__init__(name, component, target)
+        # Identify which wires SHOULD be cut based on the binary target
+        # e.g., if target is 5 (00101), sequence is [2, 4]
+        self._target_sequence = [i for i in range(5) if (self._target & (1 << (4 - i)))]
+        # Tracks our progress through the required sequence
+        self._current_cut_index = 0 
 
     # runs the thread
     def run(self):
         self._running = True
-        # Assume all wires start connected (True)
+        # Initial state: all wires connected (True)
         previous_state = [True] * 5 
         
         while (self._running):
-            # Read current state of wires (False means it has been unplugged/cut)
+            # Read current physical state of wires
             current_state = [pin.value for pin in self._component]
             
-            # Only process if a wire state has changed
+            # Only process if a wire was just disconnected
             if (current_state != previous_state):
-                # Identify which wires are currently cut (index 0-4)
-                cut_wires = [i for i, val in enumerate(current_state) if not val]
+                for i in range(5):
+                    # Check if THIS specific wire was just cut (True -> False transition)
+                    if previous_state[i] and not current_state[i]:
+                        
+                        # Check if we have more wires left to cut in our sequence
+                        if self._current_cut_index < len(self._target_sequence):
+                            expected_wire = self._target_sequence[self._current_cut_index]
+                            
+                            if i == expected_wire:
+                                # Correct wire cut in the correct order!
+                                self._current_cut_index += 1
+                                
+                                # Check if the phase is now fully defused
+                                if self._current_cut_index == len(self._target_sequence):
+                                    self._defused = True
+                            else:
+                                # Wrong wire OR wrong order -> Strike!
+                                self._failed = True
+                        else:
+                            # User cut an extra wire after already defusing/finishing sequence
+                            self._failed = True
                 
-                # Identify which wires SHOULD be cut based on the binary target
-                # (MSB corresponds to index 0)
-                target_wires = [i for i in range(5) if (self._target & (1 << (4 - i)))]
-                
-                # Check for any incorrect cuts
-                is_failed = False
-                for wire in cut_wires:
-                    if wire not in target_wires:
-                        self._failed = True
-                        is_failed = True
-                        # Update previous state to avoid multiple strikes for the same bad cut
-                        previous_state = current_state
-                        break
-                
-                # If no wrong wires are cut, check if ALL correct wires are cut
-                if (not is_failed and sorted(cut_wires) == sorted(target_wires)):
-                    self._defused = True
-                
+                # Update state to prepare for the next cut
                 previous_state = current_state
                 
             sleep(0.1)
 
-    # returns the jumper wires state as a string
+    # returns the jumper wires state as a string for the Label UI
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
         else:
-            # Return the binary representation of the physical wires
+            # Shows 1 for connected, 0 for cut (e.g., "11011")
             return "".join(["1" if pin.value else "0" for pin in self._component])
-
 # the pushbutton phase
 class Button(PhaseThread):
     def __init__(self, component_state, component_rgb, target, color, timer, name="Button"):
