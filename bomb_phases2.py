@@ -150,18 +150,19 @@ class Lcd(Frame):
                 gif.seek(len(self.frames))  # move to next frame
         except EOFError:
             pass
-
-# label to display animation
-self.end_label = Label(self, bg="black")
-self.end_label.grid(row=0, column=0, columnspan=3, pady=20)
-
-# animate function
-def animate(index=0):
-    frame = self.frames[index]
-    self.end_label.configure(image=frame)
-    self.after(100, animate, (index + 1) % len(self.frames))
-
-animate()
+        
+        # label to display animation
+        self.end_label = Label(self, bg="black")
+        self.end_label.grid(row=0, column=0, columnspan=3, pady=20)
+        
+        # animate function
+        def animate(index=0):
+            frame = self.frames[index]
+            self.end_label.configure(image=frame)
+            self.end_label.image = frame
+            self.after(100, animate, (index + 1) % len(self.frames))
+        
+        animate()
 
         # retry button
         self._bretry = tkinter.Button(
