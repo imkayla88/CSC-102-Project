@@ -123,7 +123,6 @@ class Lcd(Frame):
         self._lscroll["text"] = ""
 
         # remove the game labels from the screen
-        self._ltimer.destroy()
         self._lkeypad.destroy()
         self._lwires.destroy()
         self._lbutton.destroy()
