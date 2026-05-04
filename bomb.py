@@ -16,6 +16,8 @@ import pygame
 pygame.mixer.init()
 bootup_sound = pygame.mixer.Sound("Transmitting.mp3")      
 bg_music = "Background.mp3"
+fail_sound = pygame.mixer.Sound("FailTrumpet.mp3")
+explosion_sound = pygame.mixer.Sound("Explosion.mp3")
 ###########
 # functions
 ###########
@@ -100,6 +102,8 @@ def check_phases():
         # the countdown has expired -> explode!
         # turn off the bomb and render the conclusion GUI
         turn_off()
+        pygame.mixer.music.stop()
+        explosion_sound.play()
         gui.after(100, gui.conclusion, False)
         # don't check any more phases
         return
@@ -163,6 +167,8 @@ def check_phases():
     if (strikes_left == 0):
         # turn off the bomb and render the conclusion GUI
         turn_off()
+        pygame.mixer.music.stop()
+        explosion_sound.play()
         gui.after(1000, gui.conclusion, False)
         # stop checking phases
         return
@@ -181,7 +187,7 @@ def check_phases():
 # handles a strike
 def strike():
     global strikes_left
-    
+    fail_sound.play()
     # note the strike
     strikes_left -= 1
 
