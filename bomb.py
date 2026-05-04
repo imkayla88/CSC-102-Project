@@ -17,7 +17,7 @@ pygame.mixer.init()
 bootup_sound = pygame.mixer.Sound("Transmitting.mp3")      
 bg_music = "Background.mp3"
 fail_sound = pygame.mixer.Sound("FailTrumpet.mp3")
-explosion_sound = pygame.mixer.Sound("Explosion.mp3")
+explosion_sound = pygame.mixer.Sound("PlasmaGun.mp3")
 cheer_sound = pygame.mixer.Sound("Cheer.mp3")
 ###########
 # functions
