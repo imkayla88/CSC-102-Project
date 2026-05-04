@@ -18,6 +18,7 @@ bootup_sound = pygame.mixer.Sound("Transmitting.mp3")
 bg_music = "Background.mp3"
 fail_sound = pygame.mixer.Sound("FailTrumpet.mp3")
 explosion_sound = pygame.mixer.Sound("Explosion.mp3")
+cheer_sound = pygame.mixer.Sound("Cheer.mp3")
 ###########
 # functions
 ###########
@@ -177,7 +178,9 @@ def check_phases():
     if (active_phases == 0):
         # turn off the bomb and render the conclusion GUI
         turn_off()
-        gui.after(100, gui.conclusion, True)
+        pygame.mixer.music.stop()
+        cheer_sound.play()
+        gui.after(1500, gui.conclusion, True)
         # stop checking phases
         return
 
