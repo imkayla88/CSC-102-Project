@@ -134,14 +134,34 @@ class Lcd(Frame):
             self._bquit.destroy()
 
         # choose the correct ending GIF
-        if success:
-            self.end_image = PhotoImage(file="win.gif")
-        else:
-            self.end_image = PhotoImage(file="lose.gif")
 
-        # show the GIF on the screen
-        self.end_label = Label(self, image=self.end_image, bg="black")
-        self.end_label.grid(row=0, column=0, columnspan=3, pady=20)
+        
+        # choose gif
+        gif_path = "win.gif" if success else "lose.gif"
+        
+        # load gif frames
+        self.frames = []
+        gif = Image.open(gif_path)
+        
+        try:
+            while True:
+                frame = ImageTk.PhotoImage(gif.copy())
+                self.frames.append(frame)
+                gif.seek(len(self.frames))  # move to next frame
+        except EOFError:
+            pass
+
+# label to display animation
+self.end_label = Label(self, bg="black")
+self.end_label.grid(row=0, column=0, columnspan=3, pady=20)
+
+# animate function
+def animate(index=0):
+    frame = self.frames[index]
+    self.end_label.configure(image=frame)
+    self.after(100, animate, (index + 1) % len(self.frames))
+
+animate()
 
         # retry button
         self._bretry = tkinter.Button(
